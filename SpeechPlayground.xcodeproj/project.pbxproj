@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		E8197FBE1E6C23DA00A145F9 /* SpeechHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8197FBD1E6C23DA00A145F9 /* SpeechHelper.swift */; };
+		E8473BB61E74328A00BAB753 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8473BB51E74328A00BAB753 /* SettingsViewController.swift */; };
+		E8473BB81E7439F800BAB753 /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8473BB71E7439F800BAB753 /* LanguageViewController.swift */; };
+		E8473BBA1E743D2800BAB753 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8473BB91E743D2800BAB753 /* SettingsManager.swift */; };
 		E8A704DC1E68154900C06B24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A704DB1E68154900C06B24 /* AppDelegate.swift */; };
 		E8A704DE1E68154900C06B24 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A704DD1E68154900C06B24 /* ViewController.swift */; };
 		E8A704E11E68154900C06B24 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8A704DF1E68154900C06B24 /* Main.storyboard */; };
@@ -18,6 +21,9 @@
 
 /* Begin PBXFileReference section */
 		E8197FBD1E6C23DA00A145F9 /* SpeechHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpeechHelper.swift; sourceTree = "<group>"; };
+		E8473BB51E74328A00BAB753 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		E8473BB71E7439F800BAB753 /* LanguageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
+		E8473BB91E743D2800BAB753 /* SettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
 		E8A704D81E68154900C06B24 /* SpeechPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpeechPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8A704DB1E68154900C06B24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E8A704DD1E68154900C06B24 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -61,6 +67,9 @@
 				E8A704ED1E68393E00C06B24 /* products.json */,
 				E8A704DB1E68154900C06B24 /* AppDelegate.swift */,
 				E8A704DD1E68154900C06B24 /* ViewController.swift */,
+				E8473BB51E74328A00BAB753 /* SettingsViewController.swift */,
+				E8473BB71E7439F800BAB753 /* LanguageViewController.swift */,
+				E8473BB91E743D2800BAB753 /* SettingsManager.swift */,
 				E8197FBD1E6C23DA00A145F9 /* SpeechHelper.swift */,
 				E8A704DF1E68154900C06B24 /* Main.storyboard */,
 				E8A704E21E68154900C06B24 /* Assets.xcassets */,
@@ -102,7 +111,7 @@
 				TargetAttributes = {
 					E8A704D71E68154800C06B24 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = UAM22JDBB2;
+						DevelopmentTeam = LAA69LK8PF;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -144,9 +153,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8473BB81E7439F800BAB753 /* LanguageViewController.swift in Sources */,
 				E8A704DE1E68154900C06B24 /* ViewController.swift in Sources */,
+				E8473BBA1E743D2800BAB753 /* SettingsManager.swift in Sources */,
 				E8A704DC1E68154900C06B24 /* AppDelegate.swift in Sources */,
 				E8197FBE1E6C23DA00A145F9 /* SpeechHelper.swift in Sources */,
+				E8473BB61E74328A00BAB753 /* SettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,13 +280,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Martin Mitrevski (7HM5TYQRE8)";
-				DEVELOPMENT_TEAM = UAM22JDBB2;
+				DEVELOPMENT_TEAM = LAA69LK8PF;
 				INFOPLIST_FILE = SpeechPlayground/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mitrevski.SpeechPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "bb899079-4e80-4e6f-97b7-dba3aad16c3b";
-				PROVISIONING_PROFILE_SPECIFIER = MartinGeneric;
+				PROVISIONING_PROFILE_SPECIFIER = GenericWithoutPrefix;
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;

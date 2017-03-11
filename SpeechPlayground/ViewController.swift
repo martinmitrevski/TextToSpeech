@@ -24,14 +24,16 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
     private var sessionProducts: [String] = [String]()
     private var deletedProducts: [String] = [String]()
     private var removalWords: Set<String> = Set<String>()
-    private var stoppingWords: Set<String> = Set<String>()
     private var cancelCalled = false
+    private var speechSynthesizer = AVSpeechSynthesizer()
+    private var audioSession = AVAudioSession.sharedInstance()
+    var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupSettingsButton()
         loadProducts()
         setupRemovalWords()
-        setupStoppingWords()
         checkPermissions()
         speechRecognizer.delegate = self
     }
@@ -73,19 +75,16 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
         self.showAlert(title: errorTitle, message: errorMessage)
     }
     
-    @IBAction func startRecording(sender: UIButton) {
-        handleRecordingStateChange()
-    }
-    
     func handleRecordingStateChange() {
         if audioEngine.isRunning {
-            self.recognizedText.text = ""
             updateProducts()
             audioEngine.stop()
+            self.stopAudioSession()
             recognitionRequest?.endAudio()
             recordingButton.isEnabled = false
             recordingButton.setTitle("Start Recording", for: .normal)
         } else {
+            self.recognizedText.text = ""
             cancelCalled = false
             checkExistingRecognitionTask()
             startAudioSession()
@@ -124,11 +123,9 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
                 recognized = result?.bestTranscription.formattedString
                 for segment in (result?.bestTranscription.segments)! {
                     let text = segment.substring.lowercased()
+                    
                     if self.removalWords.contains(text) {
                         shouldDelete = true
-                    }
-                    if self.checkStoppingWords(text: text) == true {
-                        return
                     }
                     if self.products.contains(text) {
                         if (shouldDelete == false) {
@@ -137,6 +134,19 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
                             self.deletedProducts.append(text)
                         }
                         shouldDelete = false
+                    }
+                    
+                    if self.timer != nil {
+                        self.timer?.invalidate()
+                        self.timer = nil
+                    }
+                    
+                    if self.cancelCalled == false {
+                        self.timer = Timer.scheduledTimer(withTimeInterval: 2,
+                                                          repeats: false,
+                                                          block: { _ in
+                                                            _ = self.handleStop()
+                        })
                     }
                 }
                 self.recognizedText.text = recognized
@@ -183,13 +193,11 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
         self.recordingButton.isEnabled = true
     }
     
-    func checkStoppingWords(text: String) -> Bool {
-        if self.stoppingWords.contains(text) {
-            if self.cancelCalled == false {
-                self.handleRecordingStateChange()
-                self.cancelCalled = true
-                return true
-            }
+    func handleStop() -> Bool {
+        if self.cancelCalled == false {
+            self.handleRecordingStateChange()
+            self.cancelCalled = true
+            return true
         }
         
         return false
@@ -202,14 +210,54 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
         }
     }
     
+    func playRemainingText() {
+        if speechSynthesizer.isSpeaking {
+            speechSynthesizer.continueSpeaking()
+        } else {
+            speechSynthesizer.speak(self.createUtterance())
+        }
+    }
+    
+    func createUtterance() -> AVSpeechUtterance {
+        let text = createRemainingText()
+        let speechUtterance = AVSpeechUtterance(string: text)
+        speechUtterance.rate = SettingsManager.currentRate()
+        speechUtterance.pitchMultiplier = SettingsManager.currentPitch()
+        speechUtterance.volume = SettingsManager.currentVolume()
+        speechUtterance.preUtteranceDelay = SettingsManager.currentDelay()
+        speechUtterance.voice = AVSpeechSynthesisVoice(language: SettingsManager.languageCode())
+        return speechUtterance
+    }
+    
+    func createRemainingText() -> String {
+        var text = "You need to buy the following products: "
+        if addedProducts.count > 0 {
+            for product in addedProducts {
+                text += product
+                text += ","
+            }
+            text += "."
+        } else {
+            text = "You don't have any remaining products on your grocery list."
+        }
+        return text
+    }
+    
     func startAudioSession() {
-        let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(AVAudioSessionCategoryRecord)
+            try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)
             try audioSession.setMode(AVAudioSessionModeMeasurement)
             try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
         } catch {
             showAudioError()
+        }
+    }
+    
+    func stopAudioSession() {
+        do {
+            try audioSession.setActive(false, with: .notifyOthersOnDeactivation)
+        } catch {
+            print("error stopping audio session")
         }
     }
     
@@ -218,12 +266,35 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
         recognitionRequest?.shouldReportPartialResults = true
     }
     
-    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
+    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer,
+                          availabilityDidChange available: Bool) {
         if available {
             recordingButton.isEnabled = true
         } else {
             recordingButton.isEnabled = false
         }
+    }
+    
+    // Navigation bar
+    func setupSettingsButton() {
+        let settingsButton = UIBarButtonItem(title: "Settings",
+                                             style: .plain, 
+                                             target: self,
+                                             action: #selector(settingsButtonClicked))
+        self.navigationItem.rightBarButtonItem = settingsButton
+    }
+    
+    func settingsButtonClicked() {
+        self.performSegue(withIdentifier: "ShowSettings", sender: self)
+    }
+    
+    // IBActions
+    @IBAction func startRecording(sender: UIButton) {
+        handleRecordingStateChange()
+    }
+    
+    @IBAction func remainingProducts(sender: UIButton) {
+        playRemainingText()
     }
     
     // UITableViewDataSource
@@ -246,13 +317,8 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
         removalWords = SpeechHelper.removalWords()
     }
     
-    func setupStoppingWords() {
-        stoppingWords = SpeechHelper.stoppingWords()
-    }
-    
     func loadProducts() {
         products = SpeechHelper.loadProducts()
     }
-    
 }
 
