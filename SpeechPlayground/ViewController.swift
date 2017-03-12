@@ -139,7 +139,7 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
                     self.timer?.invalidate()
                     self.timer = nil
                     
-                    if self.cancelCalled == false {
+                    if !self.cancelCalled {
                         self.timer = Timer.scheduledTimer(withTimeInterval: 2,
                                                           repeats: false,
                                                           block: { _ in
