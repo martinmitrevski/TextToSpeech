@@ -128,7 +128,7 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
                         shouldDelete = true
                     }
                     if self.products.contains(text) {
-                        if (shouldDelete == false) {
+                        if (!shouldDelete) {
                             self.sessionProducts.append(text)
                         } else {
                             self.deletedProducts.append(text)
@@ -136,10 +136,8 @@ class ViewController: UIViewController, SFSpeechRecognizerDelegate, UITableViewD
                         shouldDelete = false
                     }
                     
-                    if self.timer != nil {
-                        self.timer?.invalidate()
-                        self.timer = nil
-                    }
+                    self.timer?.invalidate()
+                    self.timer = nil
                     
                     if self.cancelCalled == false {
                         self.timer = Timer.scheduledTimer(withTimeInterval: 2,
